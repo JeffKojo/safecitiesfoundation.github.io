@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>News &amp; Insights — Safe Cities Foundation</title>
+  <meta name="description" content="The latest updates, field reports, and publications from Safe Cities Foundation's road-safety and urban-mobility work across Kumasi and the Ashanti Region." />
+  <link rel="icon" type="image/png" href="assets/img/logo/fc_icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body data-page="news">
+
+  <div id="site-header"></div>
+
+  <!-- ============ PAGE HERO ============ -->
+  <section class="page-hero">
+    <div class="hero__grid-bg" aria-hidden="true"></div>
+    <div class="hero__stripe" aria-hidden="true"></div>
+    <div class="page-hero__inner">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Home</a><span class="sep">/</span>News</nav>
+      <p class="page-hero__eyebrow"><span class="rule"></span>News &amp; Insights</p>
+      <h1 class="page-hero__title">Latest from Safe Cities</h1>
+      <p class="page-hero__lead">Field updates, partnership announcements, and reports from the streets of Kumasi — where our work is making journeys safer every day.</p>
+    </div>
+  </section>
+
+  <!-- ============ NEWS ============ -->
+  <section class="section wrap" id="news">
+    <!-- Populated from js/content.js (Firebase-ready) — shows ALL news -->
+    <div class="news__grid" data-render="news"></div>
+  </section>
+
+  <!-- ============ DONATE CTA ============ -->
+  <section class="donate">
+    <div class="donate__grid-bg" aria-hidden="true"></div>
+    <div class="donate__inner">
+      <p class="donate__eyebrow" data-reveal="up">Stay Involved</p>
+      <h2 class="donate__title" data-reveal="up" data-delay="0.06">Be part of the next chapter</h2>
+      <p class="donate__sub" data-reveal="up" data-delay="0.12">Follow our progress, partner on a project, or support the work directly. Every collaboration moves us closer to cities built for people.</p>
+      <div class="donate__actions" data-reveal="up" data-delay="0.18">
+        <a class="btn btn-light" href="index.html#contact"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1L9.5 6h5L10.5 9l1.5 5L8 11 4 14l1.5-5L1.5 6H6.5L8 1z" stroke="currentColor" stroke-width="1.3"/></svg>Become a Donor</a>
+        <a class="btn-outline-light" href="index.html#contact">Partner With Us →</a>
+      </div>
+    </div>
+  </section>
+
+  <div id="site-footer"></div>
+
+  <script src="js/layout.js"></script>
+  <script src="js/content.js"></script>
+  <script src="js/main.js"></script>
+  <script type="module" src="js/firebase.js"></script>
+</body>
+</html>
