@@ -1,7 +1,0 @@
-# Safe Cities Foundation
-# Update the Sitemap URL below if you move to a custom domain.
-User-agent: *
-Allow: /
-Disallow: /admin.html
-
-Sitemap: https://scfofficial.netlify.app/sitemap.xml
