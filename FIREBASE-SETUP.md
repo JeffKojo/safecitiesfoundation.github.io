@@ -25,8 +25,16 @@ member who will post updates. They'll use these to sign in at `admin.html`.
 ## 3. Paste the security rules
 
 Firestore → **Rules** tab → replace everything with the block below → **Publish**.
-This lets the public *read* projects & news, lets anyone *send* a contact message,
-and restricts all editing/reading of messages to signed-in staff.
+
+> **If you have published rules before, you must publish again.** The `team`,
+> `partners` and `subscribers` blocks are newer than the original set. Until they are
+> published, the browser console shows `permission-denied` for those collections and
+> the site falls back to its built-in content — so Team and Partners edits you make in
+> the admin will not appear on the public site. Projects and News keep working
+> regardless; each collection is loaded independently.
+
+This lets the public *read* projects, news, team and partners, lets anyone *send* a
+contact message or subscribe, and restricts all editing to signed-in staff.
 
 ```
 rules_version = '2';
@@ -42,9 +50,23 @@ service cloud.firestore {
       allow read: if true;
       allow write: if request.auth != null;
     }
+    match /team/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /partners/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
 
     // Contact form — anyone can submit; only staff can read/manage
     match /messages/{id} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+    }
+
+    // Newsletter sign-ups — anyone can subscribe; only staff can read the list
+    match /subscribers/{id} {
       allow create: if true;
       allow read, update, delete: if request.auth != null;
     }
@@ -76,6 +98,13 @@ site immediately (a refresh).
 | `js/content.js` | Still holds the **seed** content shown if the database is empty/unreachable |
 
 ## Notes & limits
+
+- **Collections used:** `projects`, `news` (public content), `messages` (contact form),
+  `subscribers` (newsletter). The last two are write-only to the public and readable
+  only by signed-in staff.
+- **Spam:** the contact form carries a hidden honeypot field. A submission with that
+  field filled is silently discarded in the browser and never written to Firestore.
+  If you ever see spam volume, add App Check in the Firebase console.
 
 - **Photos:** auto-resized to ~1400px and stored in the document. Keep individual
   photos reasonable; the browser compresses them to stay within Firestore's 1 MB
