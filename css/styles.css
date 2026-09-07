@@ -886,9 +886,9 @@ a.detail__v:hover { color: var(--orange); }
 .ftr__col a:hover { color: #fff; transform: translateX(3px); }
 .ftr__nl { margin-top: 26px; }
 .ftr__nl p { font-size: .86rem; margin-bottom: 12px; }
-.ftr__nl-row { display: flex; gap: 8px; }
+.ftr__nl-row { display: flex; flex-wrap: wrap; gap: 8px; }
 .ftr__nl-row input {
-  flex: 1; min-width: 0; padding: 12px 14px; min-height: 46px;
+  flex: 1 1 100%; min-width: 160px; padding: 12px 14px; min-height: 46px;
   border: 1px solid rgba(255,255,255,.18); border-radius: 3px;
   background: rgba(255,255,255,.07); color: #fff; font-family: inherit; font-size: .88rem; outline: none;
   transition: border-color .2s var(--ease);
@@ -915,6 +915,21 @@ a.detail__v:hover { color: var(--orange); }
 }
 .ftr__legal { display: flex; flex-wrap: wrap; gap: 22px; }
 .ftr__legal a:hover { color: #fff; }
+
+/* Footer — tablet: brand full width, nav columns beneath it */
+@media (max-width: 900px) {
+  .ftr__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px 28px; }
+  .ftr__brand { grid-column: 1 / -1; }
+  .ftr__brand p { max-width: 52ch; }
+}
+/* Footer — phone: single column stack */
+@media (max-width: 640px) {
+  .ftr__grid { grid-template-columns: minmax(0, 1fr); gap: 36px; }
+  .ftr__brand p { max-width: none; }
+  .ftr__col h5 { margin-bottom: 10px; }
+  .ftr__nl-row button { flex: 1 1 auto; }
+  .ftr__bot { justify-content: flex-start; }
+}
 
 /* Back to top */
 .totop {
