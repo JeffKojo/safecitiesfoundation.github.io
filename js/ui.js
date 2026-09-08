@@ -201,11 +201,22 @@
     var dots = $$('.hero__dot', hero);
     if (slides.length < 2) { if (slides[0]) slides[0].classList.add('is-on'); return; }
 
-    var i = 0, timer = null, DUR = 7000;
-    hero.style.setProperty('--dur', (DUR / 1000) + 's');
+    var i = 0, DUR = 7000;
+    var elapsed = 0, last = 0, raf = null, hover = false, offscreen = false;
+
+    /* One clock drives both the slide change and the progress bar.
+       Previously setInterval advanced the slide while a CSS animation drew the
+       bar — two independent clocks that drift apart whenever the browser
+       throttles timers (background tab), leaving the bar stuck mid-fill or
+       full while the slide sat still. */
+    function paint() {
+      var p = Math.min(elapsed / DUR, 1);
+      tabs.forEach(function (t, x) { t.style.setProperty('--p', x === i ? p : 0); });
+    }
 
     function show(n) {
       i = (n + slides.length) % slides.length;
+      elapsed = 0;
       slides.forEach(function (s, x) { s.classList.toggle('is-on', x === i); });
       tabs.forEach(function (t, x) {
         var on = x === i;
@@ -213,10 +224,30 @@
         t.setAttribute('aria-selected', on ? 'true' : 'false');
       });
       dots.forEach(function (d, x) { d.classList.toggle('is-on', x === i); });
+      paint();
     }
-    function next() { show(i + 1); }
-    function start() { if (reduce) return; stop(); timer = setInterval(next, DUR); }
-    function stop() { if (timer) { clearInterval(timer); timer = null; } }
+
+    function frame(ts) {
+      raf = requestAnimationFrame(frame);
+      var dt = last ? ts - last : 0;
+      last = ts;
+      if (hover || offscreen || document.hidden) return;
+      /* A gap this large means the page was suspended, not slow. Swallow it
+         rather than fast-forwarding through several slides at once. */
+      if (dt > 900) dt = 0;
+      elapsed += dt;
+      if (elapsed >= DUR) { show(i + 1); return; }
+      paint();
+    }
+
+    function start() {
+      if (reduce) return;
+      elapsed = 0; paint();
+      if (raf === null) { last = 0; raf = requestAnimationFrame(frame); }
+    }
+    function stop() {
+      if (raf !== null) { cancelAnimationFrame(raf); raf = null; last = 0; }
+    }
 
     tabs.forEach(function (t, x) {
       t.addEventListener('click', function () { show(x); start(); });
@@ -225,19 +256,28 @@
       d.addEventListener('click', function () { show(x); start(); });
     });
 
-    hero.addEventListener('mouseenter', function () { hero.classList.add('is-paused'); stop(); });
-    hero.addEventListener('mouseleave', function () { hero.classList.remove('is-paused'); start(); });
-    hero.addEventListener('focusin', function () { stop(); });
+    hero.addEventListener('mouseenter', function () { hover = true; });
+    hero.addEventListener('mouseleave', function () { hover = false; last = 0; });
+    hero.addEventListener('focusin', function () { hover = true; });
+    hero.addEventListener('focusout', function () { hover = false; last = 0; });
+
+    /* Returning to a backgrounded tab: restart this slide's countdown from
+       zero so the bar and the slide always agree. */
+    document.addEventListener('visibilitychange', function () {
+      last = 0;
+      if (!document.hidden) { elapsed = 0; paint(); }
+    });
 
     // touch swipe
     var sx = 0, sy = 0, tracking = false;
     hero.addEventListener('touchstart', function (e) {
-      sx = e.touches[0].clientX; sy = e.touches[0].clientY; tracking = true; stop();
+      sx = e.touches[0].clientX; sy = e.touches[0].clientY; tracking = true; hover = true;
     }, { passive: true });
     hero.addEventListener('touchend', function (e) {
       if (!tracking) return; tracking = false;
       var dx = e.changedTouches[0].clientX - sx;
       var dy = e.changedTouches[0].clientY - sy;
+      hover = false; last = 0;
       if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) show(i + (dx < 0 ? 1 : -1));
       start();
     }, { passive: true });
@@ -245,7 +285,11 @@
     // pause when offscreen
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(function (ents) {
-        ents.forEach(function (en) { en.isIntersecting ? start() : stop(); });
+        ents.forEach(function (en) {
+          offscreen = !en.isIntersecting;
+          last = 0;
+          if (en.isIntersecting && raf === null && !reduce) raf = requestAnimationFrame(frame);
+        });
       }, { threshold: .15 }).observe(hero);
     }
 
