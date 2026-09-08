@@ -510,11 +510,11 @@ body.drawer-open .burger i::after  { top: 0; transform: rotate(-45deg); }
 }
 .hero__tab::after {
   content: ""; position: absolute; left: 0; top: 0; height: 2px; width: 100%;
-  background: var(--orange); transform: scaleX(0); transform-origin: left;
+  background: var(--orange); transform-origin: left;
+  /* Driven frame-by-frame from JS (--p, 0–1) so the bar and the slide share
+     one clock and cannot drift apart. */
+  transform: scaleX(var(--p, 0));
 }
-.hero__tab.is-on::after { animation: tabFill var(--dur, 7s) linear forwards; }
-@keyframes tabFill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-.hero.is-paused .hero__tab.is-on::after { animation-play-state: paused; }
 
 @media (max-width: 860px) {
   .hero__vp { height: clamp(520px, 78vh, 680px); }
